@@ -17,7 +17,7 @@ const AddTodo = ({ addTodo }) => {
     const handleDone = () => {
         if (newTodo.trim() !== '') {
             addTodo(newTodo);
-            setNewTodo('');
+            setNewTodo('')
         }
         setIsTaskModalOpen(false);
     };
@@ -43,20 +43,22 @@ const AddTodo = ({ addTodo }) => {
                             value={newTodo}
                             onChange={(e) => setNewTodo(e.target.value)} // Update newTodo state as user types
                             className="w-[250px] h-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none mb-4"
-                            placeholder="Describe your task here..."
+                            placeholder="task here..."
                         />
 
                         {/* Buttons */}
                         <div className="flex justify-between">
                             <button
                                 onClick={handleCancel}
-                                className="text-blue-500 p-2 rounded-lg border-none"
+                                className=" p-2 rounded-lg border-none"
+                                style={{ color: 'blue' }} 
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleDone}
-                                className="text-blue-500 p-2 rounded-lg border-none"
+                                className=" p-2 rounded-lg border-none"
+                                style={{ color: 'blue' }} 
                             >
                                 Done
                             </button>
@@ -67,7 +69,6 @@ const AddTodo = ({ addTodo }) => {
         </div>
     );
 };
-
 export default AddTodo;
 
 

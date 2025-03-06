@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AddTodo from './AddTodo';  // Import AddTodo component
+import AddTodo from './AddTodo'; 
 
 const TodoApp = () => {
   const initialTodos = [
@@ -7,7 +7,7 @@ const TodoApp = () => {
     { id: 2, text: 'Pay for rent', completed: false },
     { id: 3, text: 'Buy a milk', completed: false },
     { id: 4, text: "don't forget to pick up Princy from school", completed: false },
-    { id: 5, text: "Buy a chocolate for Charlotte", completed: false },
+    { id: 5, text: "Buy a chocolate", completed: false },
   ];
 
   const [todos, setTodos] = useState(initialTodos);
@@ -19,8 +19,6 @@ const TodoApp = () => {
       )
     );
   };
-
-  // Function to add a new todo item
   const addTodo = (text) => {
     const newTodoItem = {
       id: todos.length + 1,
@@ -32,13 +30,15 @@ const TodoApp = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen  bg-gray-500">
-      <div className="w-[300px] h-[500px] p-6 border-2 border-gray-300 rounded-lg shadow-lg bg-white">
+      <div className="w-[330px] h-[500px] p-6 rounded-lg shadow-lg bg-white"
+       style={{ background: 'white' }}
+      >
         <h1 className="text-center text-2xl font-semibold mb-4">To-Do List</h1>
 
         {/* Pass the addTodo function as a prop to AddTodo */}
         <AddTodo addTodo={addTodo} />
 
-        {/* Render the to-do list */}
+        {/* Render the todo list */}
         <ul className="space-y-4">
           {todos.map((todo) => (
             <li
