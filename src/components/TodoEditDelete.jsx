@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { MdEdit } from "react-icons/md"; // edit icon
+import { MdEdit } from "react-icons/md"; // Edit icon
 import { FaTrashAlt } from "react-icons/fa"; // Delete icon
 import moment from "moment"; // Import moment to handle date comparisons
 
-const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
+const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newText, setNewText] = useState(todo.text);
   const [dueDate, setDueDate] = useState(todo.dueDate || ""); // State for the due date (alarm)
   const [alarmStatusColor, setAlarmStatusColor] = useState("purple"); // State for circle color
   const [isDeleting, setIsDeleting] = useState(false); // State to manage delete confirmation
+  const [error, setError] = useState({}); // To manage error state for date input
 
   const handleEditChange = (e) => {
     setNewText(e.target.value);
   };
 
   const handleDueDateChange = (e) => {
-    setDueDate(e.target.value); // Handle the change for the due date
+    const inputDate = e.target.value;
+    const isValidDate = moment(inputDate, "YYYY-MM-DDTHH:mm", true).isValid(); // Check if the date is valid
+
+    if (isValidDate) {
+      setDueDate(inputDate); // Update the state if the date is valid
+      setError({ ...error, alarm: null }); // Clear the error
+    } else {
+      setError({ ...error, alarm: "Invalid date format" }); // Set error message for invalid date
+    }
   };
 
   const handleEditSubmit = () => {
@@ -34,17 +43,18 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
   };
 
   const handleCancelDelete = () => {
-    setIsDeleting(false); 
+    setIsDeleting(false);
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false); 
+    setIsEditing(false);
   };
+
   useEffect(() => {
     const checkAlarmStatus = () => {
       if (dueDate) {
-        const currentTime = moment(); 
-        const alarmTime = moment(dueDate); 
+        const currentTime = moment();
+        const alarmTime = moment(dueDate);
         if (alarmTime.isBefore(currentTime)) {
           setAlarmStatusColor("red");
         } else {
@@ -52,34 +62,42 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
         }
       }
     };
-    checkAlarmStatus();
+    if (selectedTodoIds.has(todo.id)) {
+      setAlarmStatusColor("green");
+    } else {
+      checkAlarmStatus();
+    }
 
-    const interval = setInterval(checkAlarmStatus, 60000); 
+    const interval = setInterval(checkAlarmStatus, 60000); // Update every minute
 
-    return () => clearInterval(interval); 
-  }, [dueDate]);
+    return () => clearInterval(interval);
+  }, [dueDate, selectedTodoIds, todo.id]);
+
+  const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Current date and time
 
   return (
     <div className="flex items-center">
-  
-<div
-        className={`w-[10px] h-[10px] border rounded-full  mr-4`} 
+      <div
+        className={`w-[10px] h-[10px] border rounded-full m-[4px]`}
         style={{
           border: "none",
-          backgroundColor: alarmStatusColor === "red" ? "red" : "rgb(182, 120, 255)" // Light purple color
+          backgroundColor:
+            alarmStatusColor === "red"
+              ? "red"
+              : alarmStatusColor === "green"
+              ? "green"
+              : "rgb(182, 120, 255)",
         }}
       ></div>
 
-      {/* Edit Button with a new icon */}
       <button
-        onClick={() => setIsEditing(true)} 
+        onClick={() => setIsEditing(true)}
         className="cursor-pointer"
         style={{ border: "none", background: "none" }}
       >
         <MdEdit size={14} />
       </button>
 
-      {/* Delete Button */}
       <button
         onClick={handleDeleteConfirmation}
         className="cursor-pointer"
@@ -88,14 +106,13 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
         <FaTrashAlt size={14} />
       </button>
 
-      {/* Edit Modal */}
       {isEditing && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center ">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center">
           <div
-            className="relative rounded-lg shadow-lg w-[280px] bg-white p-6 border rounded-[10px]"
+            className="relative rounded-lg shadow-lg w-[261px] bg-white p-6 border rounded-[10px]"
             style={{
               position: "fixed",
-              top: "43%",
+              top: "45%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
@@ -103,39 +120,48 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
               border: "1px solid rgba(169, 169, 169, 0.3)", // Light gray border
             }}
           >
-            <h1 className="text-xl" style={{ fontSize: "19px", paddingLeft: "7px" }}>
+            <h1
+              className="text-xl text-[#52565b]"
+              style={{ fontSize: "19px", paddingLeft: "7px", fontFamily: "system-ui" }}
+            >
               Edit Todo
             </h1>
 
             <div className="bg-white p-6 rounded-lg">
-              {/* Input field for editing */}
               <textarea
                 type="text"
                 value={newText}
                 onChange={handleEditChange}
-                className="border rounded-[10px] mb-4 h-[100px] w-[253px] ml-[10px]"
+                className="border rounded-[10px] mb-4 h-[100px] w-[237px] ml-[10px]"
                 style={{
-                  border: "1px solid rgba(169, 169, 169, 0.3)", // Light gray border
+                  resize: 'none',
+                  border: "1px solid rgba(169, 169, 169, 0.3)",
                 }}
               />
 
-              {/* Input field for setting alarm */}
               <input
                 type="datetime-local"
                 value={dueDate}
                 onChange={handleDueDateChange}
-                className="border rounded-[10px] mb-4 h-[40px] w-[253px] ml-[10px] mt-[7px]"
-                placeholder="Set Alarm"
+                min={minDate} // Prevent selecting a date earlier than now
+                className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
                 style={{
-                  border: "1px solid rgba(169, 169, 169, 0.3)", // Light gray border
+                  border: "1px solid rgba(169, 169, 169, 0.3)",
+                  
                 }}
+                inputMode="none"
+                onKeyDown={(e) => e.preventDefault()} // Prevent any typing
               />
+              {/* Alarm error message */}
+              {error.alarm && (
+                <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>
+              )}
 
               {/* Buttons */}
               <div className="flex justify-between space-x-4 mt-[15px] pb-[10px]">
                 <button
-                  className="bg-gray-300 p-2 rounded text-sm ml-[12px] text-[blue] cursor-pointer"
-                  onClick={handleCancelEdit} // Cancel edit
+                  className="bg-gray-300 p-2 rounded text-sm ml-[12px] text-[#00bbf9] cursor-pointer"
+                  onClick={handleCancelEdit}
                   style={{
                     background: "none",
                     border: "none",
@@ -146,7 +172,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
                 </button>
                 <button
                   onClick={handleEditSubmit}
-                  className="bg-blue-500 p-2 rounded text-white text-sm mr-[17px] text-[blue] cursor-pointer"
+                  className="bg-blue-500 p-2 rounded text-white text-sm mr-[17px] text-[#00bbf9] cursor-pointer"
                   style={{
                     background: "none",
                     border: "none",
@@ -161,11 +187,10 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {isDeleting && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center">
           <div
-            className="bg-white rounded-lg shadow-lg p-6 w-[350px] h-[120px]"
+            className="bg-white rounded-lg shadow-lg p-6 w-[280px] h-[120px]"
             style={{
               position: "fixed",
               top: "50%",
@@ -173,7 +198,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
               transform: "translate(-50%, -50%)",
               zIndex: 1000,
               background: "white",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)", // Added box-shadow here
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)",
             }}
           >
             <p className="text-sm text-center mb-4 pt-[20px]">Do you really want to delete this todo?</p>
@@ -201,4 +226,3 @@ const TodoEditDelete = ({ todo, onEdit, onDelete }) => {
 };
 
 export default TodoEditDelete;
-
