@@ -5,9 +5,9 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
   const [dueDate, setDueDate] = useState('');
   const [error, setError] = useState({ todo: '', alarm: '' });
   const [minDate, setMinDate] = useState('');
+
   useEffect(() => {
     const currentDate = new Date();
-
     const minDateString = currentDate.toISOString().slice(0, 16);
     setMinDate(minDateString);
   }, []);
@@ -31,7 +31,7 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
     }
 
     if (!dueDate) {
-      newError.alarm = 'Alarm is required';
+      newError.alarm = 'Alarm time is required';
       valid = false;
     }
 
@@ -45,28 +45,36 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
     onClose();
     setError({ todo: '', alarm: '' });
   };
+
   return (
     isOpen && (
-      <div className="fixed inset-0 bg-white bg-opacity-100 z-50 mb-[90px] ">
-
-        <div className="rounded-lg shadow-lg w-[261px] border rounded-[10px]" style={{
-          background: 'white',
-          border: '1px solid rgba(169, 169, 169, 0.3)'
-        }}
+      <div className="fixed inset-0 bg-white bg-opacity-100 z-50 mb-[90px]">
+        <div
+          className="rounded-lg shadow-lg w-[272px] border rounded-[10px]"
+          style={{
+            background: 'white',
+            border: '1px solid rgba(169, 169, 169, 0.3)',
+          }}
         >
           {/* Heading */}
-          <h1 className="text-xl  text-[#52565b]" style={{ fontSize: '19px', paddingLeft: '7px',fontFamily: "system-ui" }}>
+          <h1
+            className="text-xl text-[#52565b]"
+            style={{ fontSize: '19px', paddingLeft: '7px', fontFamily: 'system-ui' }}
+          >
             Add Todo
           </h1>
-          <div className="bg-white p-6 rounded-lg " >
+          <div className="bg-white p-6 rounded-lg">
             <textarea
               type="text"
               value={newTodoText}
               onChange={handleInputChange}
-              className={`border rounded-[10px] h-[100px] w-[237px] ml-[10px] ${error.todo || !newTodoText.trim() ? 'border-red-500' : 'border-gray-300'}`}
+              className={`border rounded-[10px] h-[100px] w-[237px] ml-[10px]  ${
+                error.todo || !newTodoText.trim() ? 'border-red-500' : 'border-gray-300'
+              }`}
               style={{
                 border: '1px solid rgba(169, 169, 169, 0.3)', // Light gray border for input field
                 resize: 'none',
+                padding: '7px',
               }}
             />
             {/* Todo error message */}
@@ -76,13 +84,14 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
               value={dueDate}
               onChange={handleDateChange}
               min={minDate}
-              className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] ${error.alarm || !dueDate ? 'border-red-500' : 'border-gray-300'} mt-[7px]`}
+              className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] pl-[12px] ${
+                error.alarm || !dueDate ? 'border-red-500' : 'border-gray-300'
+              } mt-[7px]`}
               style={{
                 border: '1px solid rgba(169, 169, 169, 0.3)',
               }}
               inputMode="none" // Prevent typing
               onKeyDown={(e) => e.preventDefault()} // Prevent manual input
-
             />
             {/* Alarm error message */}
             {error.alarm && <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>}
@@ -120,4 +129,7 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
 };
 
 export default TodoAdd;
+
+
+
 

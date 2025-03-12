@@ -7,9 +7,9 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newText, setNewText] = useState(todo.text);
   const [dueDate, setDueDate] = useState(todo.dueDate || ""); // State for the due date (alarm)
-  const [alarmStatusColor, setAlarmStatusColor] = useState("purple"); // State for circle color
-  const [isDeleting, setIsDeleting] = useState(false); // State to manage delete confirmation
-  const [error, setError] = useState({}); // To manage error state for date input
+  const [alarmStatusColor, setAlarmStatusColor] = useState("purple"); 
+  const [isDeleting, setIsDeleting] = useState(false); 
+  const [error, setError] = useState({});
 
   const handleEditChange = (e) => {
     setNewText(e.target.value);
@@ -23,15 +23,32 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       setDueDate(inputDate); // Update the state if the date is valid
       setError({ ...error, alarm: null }); // Clear the error
     } else {
-      setError({ ...error, alarm: "Invalid date format" }); // Set error message for invalid date
+      setError({ ...error, alarm: "Invalid date format" }); 
     }
   };
-
   const handleEditSubmit = () => {
-    // Passing the new text and due date while editing
+    let valid = true;
+    let newError = { todo: '', alarm: '' };
+  
+    if (!newText.trim()) {
+      newError.todo = "Todo is required";
+      valid = false;
+    }
+  
+    if (!dueDate) {
+      newError.alarm = "Alarm time is required";
+      valid = false;
+    }
+  
+    if (newError.todo || newError.alarm) {
+      setError(newError);
+      return;
+    }
     onEdit(todo.id, newText, dueDate);
     setIsEditing(false);
   };
+  
+
 
   const handleDelete = () => {
     onDelete(todo.id);
@@ -68,18 +85,18 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       checkAlarmStatus();
     }
 
-    const interval = setInterval(checkAlarmStatus, 60000); // Update every minute
+    const interval = setInterval(checkAlarmStatus, 60000); 
 
     return () => clearInterval(interval);
   }, [dueDate, selectedTodoIds, todo.id]);
 
-  const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Current date and time
+    const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Current date and time
 
   return (
     <div className="flex items-center">
       <div
-        className={`w-[10px] h-[10px] border rounded-full m-[4px]`}
-        style={{
+         className={`w-[10px] h-[10px] border rounded-full m-[4px]`}
+         style={{
           border: "none",
           backgroundColor:
             alarmStatusColor === "red"
@@ -109,7 +126,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       {isEditing && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center">
           <div
-            className="relative rounded-lg shadow-lg w-[261px] bg-white p-6 border rounded-[10px]"
+            className="relative rounded-lg shadow-lg w-[272px] bg-white p-6 border rounded-[10px]"
             style={{
               position: "fixed",
               top: "45%",
@@ -132,25 +149,30 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
                 type="text"
                 value={newText}
                 onChange={handleEditChange}
-                className="border rounded-[10px] mb-4 h-[100px] w-[237px] ml-[10px]"
+                className="border rounded-[10px] mb-4 h-[100px] w-[237px] ml-[10px] "
                 style={{
                   resize: 'none',
                   border: "1px solid rgba(169, 169, 169, 0.3)",
+                  padding: "7px",
                 }}
               />
+
+              {/* Todo error message */}
+              {error.todo && (
+                <p className="text-[red] text-sm mt-1 pl-[10px]">{error.todo}</p>
+              )}
 
               <input
                 type="datetime-local"
                 value={dueDate}
                 onChange={handleDueDateChange}
                 min={minDate} // Prevent selecting a date earlier than now
-                className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
+                className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] pl-[12px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
                 style={{
                   border: "1px solid rgba(169, 169, 169, 0.3)",
-                  
                 }}
                 inputMode="none"
-                onKeyDown={(e) => e.preventDefault()} // Prevent any typing
+                onKeyDown={(e) => e.preventDefault()}
               />
               {/* Alarm error message */}
               {error.alarm && (
@@ -226,3 +248,5 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
 };
 
 export default TodoEditDelete;
+
+
