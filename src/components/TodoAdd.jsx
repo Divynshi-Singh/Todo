@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
   const [newTodoText, setNewTodoText] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -9,7 +8,7 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
   useEffect(() => {
     const currentDate = new Date();
     const minDateString = currentDate.toISOString().slice(0, 16);
-    setMinDate(minDateString);
+    setMinDate(minDateString); // Setting the min date as current date and time
   }, []);
 
   const handleInputChange = (e) => {
@@ -18,8 +17,15 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
   };
 
   const handleDateChange = (e) => {
-    setDueDate(e.target.value);
-    setError((prev) => ({ ...prev, alarm: '' }));
+    const selectedDate = e.target.value;
+
+    // Ensure the selected date is in the valid format
+    if (new Date(selectedDate) < new Date(minDate)) {
+      setError((prev) => ({ ...prev, alarm: 'Alarm time must be in the future.' }));
+    } else {
+      setDueDate(selectedDate);
+      setError((prev) => ({ ...prev, alarm: '' }));
+    }
   };
 
   const handleAddClick = () => {
@@ -39,6 +45,7 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
       setError(newError);
       return;
     }
+
     onAddTodo(newTodoText, dueDate);
     setNewTodoText('');
     setDueDate('');
@@ -48,45 +55,86 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
 
   return (
     isOpen && (
-      <div className="fixed inset-0 bg-white bg-opacity-100 z-50 mb-[90px]">
-        <div
-          className="rounded-lg shadow-lg w-[272px] border rounded-[10px]"
-          style={{
-            background: 'white',
-            border: '1px solid rgba(169, 169, 169, 0.3)',
-          }}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+           zIndex: 50,
+        }}
+      >
+        {/* Backdrop */}
+        <div className="backdrop"></div>
+
+        {/* Modal Content */}
+        <div className="modal-content"
+        
+        style={{
+          position: "fixed",
+          top: "45%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 1000,
+          background: "white",
+          border: "1px solid rgba(169, 169, 169, 0.3)",
+          padding: "10px",
+          marginTop : " 13px",
+        }}
+
         >
+       
           {/* Heading */}
           <h1
-            className="text-xl text-[#52565b]"
-            style={{ fontSize: '19px', paddingLeft: '7px', fontFamily: 'system-ui' }}
+            style={{
+              fontSize: '19px',
+              paddingLeft: '7px',
+              fontFamily: 'system-ui',
+              marginBottom: '10px',
+              color: '#52565b',
+            }}
           >
             Add Todo
           </h1>
-          <div className="bg-white p-6 rounded-lg">
+
+          {/* Modal Body */}
+          <div>
             <textarea
               type="text"
               value={newTodoText}
               onChange={handleInputChange}
-              className={`border rounded-[10px] h-[100px] w-[237px] ml-[10px]  ${
-                error.todo || !newTodoText.trim() ? 'border-red-500' : 'border-gray-300'
-              }`}
               style={{
-                border: '1px solid rgba(169, 169, 169, 0.3)', // Light gray border for input field
-                resize: 'none',
+                width: '217px',
+                height: '100px',
+                marginLeft: '10px',
                 padding: '7px',
+                border: '1px solid rgba(169, 169, 169, 0.3)',
+                borderRadius: '10px',
+                resize: 'none',
               }}
+              className={`border rounded-[10px] ${error.todo || !newTodoText.trim() ? 'border-red-500' : 'border-gray-300'
+                }`}
             />
             {/* Todo error message */}
-            {error.todo && <p className="text-[red] text-sm mt-1 pl-[10px]">{error.todo}</p>}
+            {error.todo && (
+              <p style={{ color: 'red', fontSize: '12px', marginTop: '5px', marginLeft: '10px' }}>
+                {error.todo}
+              </p>
+            )}
+
+            {/* Date input field */}
+
             <input
               type="datetime-local"
               value={dueDate}
               onChange={handleDateChange}
               min={minDate}
-              className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] pl-[12px] ${
-                error.alarm || !dueDate ? 'border-red-500' : 'border-gray-300'
-              } mt-[7px]`}
+              className={`border rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] ${error.alarm || !dueDate ? 'border-red-500' : 'border-gray-300'
+                } mt-[7px]`}
               style={{
                 border: '1px solid rgba(169, 169, 169, 0.3)',
               }}
@@ -97,25 +145,38 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
             {error.alarm && <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>}
 
             {/* Buttons */}
-            <div className="flex justify-between space-x-4 mt-[15px] pb-[10px]">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: '15px',
+                paddingBottom: '10px',
+              }}
+            >
               <button
-                onClick={onClose}
-                className="bg-gray-300 p-2 rounded text-sm ml-[12px] text-[#00bbf9] cursor-[pointer]"
+                onClick={onClose} // This will close the modal
                 style={{
                   background: 'none',
                   border: 'none',
                   fontSize: '18px',
+                  color: '#00bbf9',
+                  cursor: 'pointer',
+                  padding: '10px 15px',
+                  borderRadius: '5px',
                 }}
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddClick}
-                className="bg-blue-500 p-2 rounded text-white text-sm mr-[17px] text-[#00bbf9] cursor-[pointer]"
+                onClick={handleAddClick} // Adds the Todo
                 style={{
                   background: 'none',
                   border: 'none',
                   fontSize: '18px',
+                  color: '#00bbf9',
+                  cursor: 'pointer',
+                  padding: '10px 15px',
+                  borderRadius: '5px',
                 }}
               >
                 Done
@@ -129,7 +190,3 @@ const TodoAdd = ({ isOpen, onClose, onAddTodo }) => {
 };
 
 export default TodoAdd;
-
-
-
-

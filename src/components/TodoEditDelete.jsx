@@ -26,6 +26,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       setError({ ...error, alarm: "Invalid date format" }); 
     }
   };
+
   const handleEditSubmit = () => {
     let valid = true;
     let newError = { todo: '', alarm: '' };
@@ -47,8 +48,6 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
     onEdit(todo.id, newText, dueDate);
     setIsEditing(false);
   };
-  
-
 
   const handleDelete = () => {
     onDelete(todo.id);
@@ -90,7 +89,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
     return () => clearInterval(interval);
   }, [dueDate, selectedTodoIds, todo.id]);
 
-    const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Current date and time
+  const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Current date and time
 
   return (
     <div className="flex items-center">
@@ -124,9 +123,9 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       </button>
 
       {isEditing && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center">
+        <div className="backdrop"> {/* Apply backdrop here */}
           <div
-            className="relative rounded-lg shadow-lg w-[272px] bg-white p-6 border rounded-[10px]"
+            className="modal-content"
             style={{
               position: "fixed",
               top: "45%",
@@ -135,6 +134,8 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
               zIndex: 1000,
               background: "white",
               border: "1px solid rgba(169, 169, 169, 0.3)", // Light gray border
+              padding: "10px",
+              marginTop: " 8px"
             }}
           >
             <h1
@@ -149,7 +150,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
                 type="text"
                 value={newText}
                 onChange={handleEditChange}
-                className="border rounded-[10px] mb-4 h-[100px] w-[237px] ml-[10px] "
+                className="border rounded-[10px] mb-4 h-[100px] w-[217px] ml-[10px]"
                 style={{
                   resize: 'none',
                   border: "1px solid rgba(169, 169, 169, 0.3)",
@@ -167,7 +168,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
                 value={dueDate}
                 onChange={handleDueDateChange}
                 min={minDate} // Prevent selecting a date earlier than now
-                className={`border rounded-[10px] mb-4 h-[40px] w-[237px] ml-[10px] pl-[12px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
+                className={`border rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
                 style={{
                   border: "1px solid rgba(169, 169, 169, 0.3)",
                 }}
@@ -210,7 +211,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       )}
 
       {isDeleting && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex justify-center items-center">
+        <div className="backdrop"> {/* Apply backdrop here */}
           <div
             className="bg-white rounded-lg shadow-lg p-6 w-[280px] h-[120px]"
             style={{
@@ -248,5 +249,3 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
 };
 
 export default TodoEditDelete;
-
-

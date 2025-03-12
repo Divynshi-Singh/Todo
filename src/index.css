@@ -23,3 +23,33 @@ body {
    
   }
   
+
+/* Backdrop Styles */
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40; 
+ 
+}
+
+/* Modal Styles */
+.modal-content {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 248px;
+  pointer-events: auto; 
+  position: "fixed";
+          top: "45%";
+          left: "50%";
+          transform: "translate(-50%, -50%)";
+          z-index: 1000;
+          background: "white";
+          border: "1px solid rgba(169, 169, 169, 0.3)"; 
+          padding: "10px";
+          margin-top : " 8px";
+ 
+}
