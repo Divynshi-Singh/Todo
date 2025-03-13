@@ -7,8 +7,8 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newText, setNewText] = useState(todo.text);
   const [dueDate, setDueDate] = useState(todo.dueDate || ""); // State for the due date (alarm)
-  const [alarmStatusColor, setAlarmStatusColor] = useState("purple"); 
-  const [isDeleting, setIsDeleting] = useState(false); 
+  const [alarmStatusColor, setAlarmStatusColor] = useState("purple");
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState({});
 
   const handleEditChange = (e) => {
@@ -23,24 +23,29 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       setDueDate(inputDate); // Update the state if the date is valid
       setError({ ...error, alarm: null }); // Clear the error
     } else {
-      setError({ ...error, alarm: "Invalid date format" }); 
+      setError({ ...error, alarm: "Invalid date format" });
     }
   };
 
   const handleEditSubmit = () => {
     let valid = true;
-    let newError = { todo: '', alarm: '' };
-  
+    let newError = { todo: "", alarm: "" };
+
     if (!newText.trim()) {
       newError.todo = "Todo is required";
       valid = false;
     }
-  
+
     if (!dueDate) {
       newError.alarm = "Alarm time is required";
       valid = false;
     }
-  
+
+    if (!valid) {
+      setError(newError); 
+      return;
+    }
+
     if (newError.todo || newError.alarm) {
       setError(newError);
       return;
@@ -60,6 +65,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
 
   const handleCancelDelete = () => {
     setIsDeleting(false);
+    setError({}); // Reset error state
   };
 
   const handleCancelEdit = () => {
@@ -84,7 +90,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       checkAlarmStatus();
     }
 
-    const interval = setInterval(checkAlarmStatus, 60000); 
+    const interval = setInterval(checkAlarmStatus, 60000);
 
     return () => clearInterval(interval);
   }, [dueDate, selectedTodoIds, todo.id]);
@@ -94,8 +100,8 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
   return (
     <div className="flex items-center">
       <div
-         className={`w-[10px] h-[10px] border rounded-full m-[4px]`}
-         style={{
+        className={`w-[10px] h-[10px] border rounded-full m-[4px]`}
+        style={{
           border: "none",
           backgroundColor:
             alarmStatusColor === "red"
@@ -107,41 +113,29 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
       ></div>
 
       <button
-        onClick={() => setIsEditing(true)}
-        className="cursor-pointer"
-        style={{ border: "none", background: "none" }}
+        onClick={() => {
+          setIsEditing(true);
+          setError({}); 
+          setNewText(todo.text); 
+        }}
+        className="cursor-pointer border-none bg-transparent"
       >
         <MdEdit size={14} />
       </button>
 
       <button
         onClick={handleDeleteConfirmation}
-        className="cursor-pointer"
-        style={{ border: "none", background: "none" }}
+        className="cursor-pointer border-none bg-transparent"
       >
         <FaTrashAlt size={14} />
       </button>
 
       {isEditing && (
-        <div className="backdrop"> {/* Apply backdrop here */}
-          <div
-            className="modal-content"
-            style={{
-              position: "fixed",
-              top: "45%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1000,
-              background: "white",
-              border: "1px solid rgba(169, 169, 169, 0.3)", // Light gray border
-              padding: "10px",
-              marginTop: " 8px"
-            }}
-          >
-            <h1
-              className="text-xl text-[#52565b]"
-              style={{ fontSize: "19px", paddingLeft: "7px", fontFamily: "system-ui" }}
-            >
+        <div className="backdrop">
+          {" "}
+          {/* Apply backdrop here */}
+          <div className="modal-content mt-[8px] p-[10px] fixed top-[45%] left-[50%] transform -translate-x-[50%] -translate-y-[50%] z-[1000] border border-[rgba(169,169,169,0.3)] ">
+            <h1 className="text-xl text-[#52565b] pl-[7px] text-[19px] font-[system-ui]">
               Edit Todo
             </h1>
 
@@ -150,17 +144,18 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
                 type="text"
                 value={newText}
                 onChange={handleEditChange}
-                className="border rounded-[10px] mb-4 h-[100px] w-[217px] ml-[10px]"
+                className="border rounded-[10px] mb-4 h-[100px] w-[217px] ml-[10px] p-[7px]"
                 style={{
-                  resize: 'none',
+                  resize: "none",
                   border: "1px solid rgba(169, 169, 169, 0.3)",
-                  padding: "7px",
                 }}
               />
 
               {/* Todo error message */}
               {error.todo && (
-                <p className="text-[red] text-sm mt-1 pl-[10px]">{error.todo}</p>
+                <p className="text-[red] text-sm mt-1 pl-[10px]">
+                  {error.todo}
+                </p>
               )}
 
               <input
@@ -168,7 +163,9 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
                 value={dueDate}
                 onChange={handleDueDateChange}
                 min={minDate} // Prevent selecting a date earlier than now
-                className={`border rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] ${error.alarm ? "border-red-500" : "border-gray-300"} mt-[7px]`}
+                className={`border rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] ${
+                  error.alarm ? "border-red-500" : "border-gray-300"
+                } mt-[7px]`}
                 style={{
                   border: "1px solid rgba(169, 169, 169, 0.3)",
                 }}
@@ -177,30 +174,22 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
               />
               {/* Alarm error message */}
               {error.alarm && (
-                <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>
+                <p className="text-[red] text-sm mt-1 pl-[10px]">
+                  {error.alarm}
+                </p>
               )}
 
               {/* Buttons */}
               <div className="flex justify-between space-x-4 mt-[15px] pb-[10px]">
                 <button
-                  className="bg-gray-300 p-2 rounded text-sm ml-[12px] text-[#00bbf9] cursor-pointer"
+                  className="bg-gray-300 p-2 rounded text-sm ml-[12px] text-[#00bbf9] cursor-pointer bg-transparent border-none text-[17px]"
                   onClick={handleCancelEdit}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "18px",
-                  }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleEditSubmit}
-                  className="bg-blue-500 p-2 rounded text-white text-sm mr-[17px] text-[#00bbf9] cursor-pointer"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    fontSize: "18px",
-                  }}
+                  className="bg-blue-500 p-2 rounded text-white text-sm mr-[17px] text-[#00bbf9] cursor-pointer bg-transparent border-none text-[17px]"
                 >
                   Edit
                 </button>
@@ -209,8 +198,7 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
           </div>
         </div>
       )}
-
-      {isDeleting && (
+{isDeleting && (
         <div className="backdrop"> {/* Apply backdrop here */}
           <div
             className="bg-white rounded-lg shadow-lg p-6 w-[280px] h-[120px]"
@@ -225,7 +213,6 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
             }}
           >
             <p className="text-sm text-center mb-4 pt-[20px]">Do you really want to delete this todo?</p>
-
             <div className="flex justify-between space-x-4">
               <button
                 onClick={handleCancelDelete}
@@ -249,3 +236,9 @@ const TodoEditDelete = ({ todo, onEdit, onDelete, selectedTodoIds }) => {
 };
 
 export default TodoEditDelete;
+
+
+
+
+
+
