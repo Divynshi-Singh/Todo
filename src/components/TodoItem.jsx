@@ -5,7 +5,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import moment from "moment";
 import TodoDeleteModal from "./TodoDeleteModel";
 
-const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
+const TodoItem = ({ todo, onEdit, toggleTaskCompletion,  onDelete }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const OpenDeleteOpen = () => {
@@ -36,7 +36,7 @@ const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
             <input
                 type="checkbox"
                 checked={todo.completed}
-                onChange={() => onCheckboxChange(todo.id)}
+                onChange={() => toggleTaskCompletion(todo.id)}
                 className="checkbox"
             />
             {/* Todo Text and Due Date */}
