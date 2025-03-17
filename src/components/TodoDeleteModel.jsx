@@ -9,7 +9,6 @@ const TodoDeleteModal = ({ onClose, onDelete }) => {
   const handleCancel = () => {
     onClose();
   };
-
   return (
     <div className="backdrop">
       <div
