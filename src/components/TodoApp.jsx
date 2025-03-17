@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { GiNetworkBars } from "react-icons/gi";
 import { FaWifi, FaBatteryFull } from "react-icons/fa";
 import { GoPlusCircle } from "react-icons/go";
-import TodoAddEdit from "./TodoAddEdit";
+import TodoAddEdit from "./TodoAddEdit"; // Ensure this is the correct component
 import TodoItem from "./TodoItem";
-import TodoDeleteModal from "./TodoDeleteModel";
 import moment from "moment";
 
 const TodoApp = () => {
@@ -13,16 +12,8 @@ const TodoApp = () => {
     return savedTodos ? JSON.parse(savedTodos) : [];
   });
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const [modalMode, setModalMode] = useState("");  // "add" or "edit"
+  const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false); // Single modal state for add/edit
   const [editingTodo, setEditingTodo] = useState(null);
-  const [selectedTodoIds, setSelectedTodoIds] = useState(() => {
-    const savedSelectedIds = localStorage.getItem("selectedTodoIds");
-    return savedSelectedIds ? new Set(JSON.parse(savedSelectedIds)) : new Set();
-  });
 
   useEffect(() => {
     const checkAlarmStatus = () => {
@@ -32,10 +23,10 @@ const TodoApp = () => {
             const currentTime = moment();
             const alarmTime = moment(todo.dueDate);
             let alarmStatusColor = "rgb(182, 120, 255)";
-            if (selectedTodoIds.has(todo.id)) {
-              alarmStatusColor = "green";
+            if (todo.completed) {
+              alarmStatusColor = "green"; // If completed, set to green
             } else if (alarmTime.isBefore(currentTime)) {
-              alarmStatusColor = "red";
+              alarmStatusColor = "red"; // If overdue, set to red
             }
             return { ...todo, alarmStatusColor };
           }
@@ -46,22 +37,23 @@ const TodoApp = () => {
     checkAlarmStatus();
     const interval = setInterval(checkAlarmStatus, 60000);
     return () => clearInterval(interval);
-  }, [selectedTodoIds]);
+  }, [todos]); // Re-run when todos change
+
   const handleAddClick = () => {
-    setIsAddModalOpen(true);
-    setModalMode("add");
-    setEditingTodo(null);
+    setIsAddEditModalOpen(true);
+    setEditingTodo(null); // Ensure we're not editing a todo
   };
+
   const handleEditClick = (todo) => {
     setEditingTodo(todo);
-    setModalMode("edit");
-    setIsEditModalOpen(true);  // Open Edit modal
+    setIsAddEditModalOpen(true);
   };
+
   const handleAddTodo = (newTodoText, dueDate) => {
     const newTodo = {
       id: Date.now(),
       text: newTodoText,
-      completed: false,
+      completed: false, // New todos start as incomplete
       dueDate: dueDate || null,
       alarmStatusColor: "rgb(182, 120, 255)",
     };
@@ -69,6 +61,7 @@ const TodoApp = () => {
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
   };
+
   const handleEditTodo = (id, newText, newDueDate) => {
     const updatedTodos = todos.map((todo) =>
       todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, alarmStatusColor: "purple" } : todo
@@ -77,22 +70,19 @@ const TodoApp = () => {
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setEditingTodo(null);
   };
+
   const handleDeleteTodo = (id) => {
     const updatedTodos = todos.filter((todo) => todo.id !== id);
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
   };
+
   const handleCheckboxChange = (id) => {
-    setSelectedTodoIds((prevIds) => {
-      const newSelectedIds = new Set(prevIds);
-      if (newSelectedIds.has(id)) {
-        newSelectedIds.delete(id);
-      } else {
-        newSelectedIds.add(id);
-      }
-      localStorage.setItem("selectedTodoIds", JSON.stringify([...newSelectedIds]));
-      return newSelectedIds;
-    });
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   };
 
   return (
@@ -125,42 +115,21 @@ const TodoApp = () => {
               todo={todo}
               onEdit={handleEditClick}
               onDelete={handleDeleteTodo}
-              onCheckboxChange={handleCheckboxChange}
-              isChecked={selectedTodoIds.has(todo.id)}
+              onCheckboxChange={handleCheckboxChange} // Use handleCheckboxChange here
+              isChecked={todo.completed} // Directly use the 'completed' field for checkbox state
             />
           ))}
         </ul>
       </div>
 
-      {/* Todo Add/Edit Modals */}
-      {isAddModalOpen && (
+      {/* Todo Add/Edit Modal */}
+      {isAddEditModalOpen && (
         <TodoAddEdit
           todo={editingTodo}
-          mode={modalMode}
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
+          isOpen={isAddEditModalOpen}
+          onClose={() => setIsAddEditModalOpen(false)}
           onAddTodo={handleAddTodo}
-          onEdit={handleEditTodo}
-        />
-      )}
-
-      {isEditModalOpen && (
-        <TodoAddEdit
-          todo={editingTodo}
-          mode={modalMode}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onAddTodo={handleAddTodo}
-          onEdit={handleEditTodo}
-        />
-      )}
-
-      {/* Todo Delete Modal */}
-      {isDeleteModalOpen && (
-        <TodoDeleteModal
-          todo={editingTodo}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onDelete={handleDeleteTodo}
+          onEditTodo={handleEditTodo}
         />
       )}
     </div>

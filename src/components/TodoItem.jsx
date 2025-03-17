@@ -8,11 +8,11 @@ import TodoDeleteModal from "./TodoDeleteModel";
 const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-    const handleDeleteClick = () => {
+    const OpenDeleteOpen = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const handleDeleteCancel = () => {
+    const CloseDeleteModal = () => {
         setIsDeleteModalOpen(false);
     };
 
@@ -35,12 +35,12 @@ const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
             {/* Checkbox */}
             <input
                 type="checkbox"
-                checked={isChecked}
+                checked={todo.completed}
                 onChange={() => onCheckboxChange(todo.id)}
                 className="checkbox"
             />
             {/* Todo Text and Due Date */}
-            <span className={`text-content flex-1 ${todo.completed ? "line-through text-gray-400" : ""}`}>
+            <span className={`text-content flex-1 ${todo.completed ? "" : ""}`}>
                 {todo.text}
                 {todo.dueDate && (
                     <div className="flex items-center space-x-2 mt-2">
@@ -62,7 +62,7 @@ const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
             <button onClick={() => onEdit(todo)} className="cursor-pointer border-none bg-transparent">
                 <MdEdit size={15} />
             </button>
-            <button onClick={handleDeleteClick} className="cursor-pointer border-none bg-transparent">
+            <button onClick={OpenDeleteOpen} className="cursor-pointer border-none bg-transparent">
                 <FaTrashAlt size={14} />
             </button>
 
@@ -70,7 +70,7 @@ const TodoItem = ({ todo, onEdit, onCheckboxChange, isChecked, onDelete }) => {
             {isDeleteModalOpen && (
                 <TodoDeleteModal
                     todo={todo}
-                    onClose={handleDeleteCancel}
+                    onClose={CloseDeleteModal}
                     onDelete={handleDeleteConfirm}
                 />
             )}
