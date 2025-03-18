@@ -69,7 +69,7 @@ const TodoApp = () => {
 
   const handleEditTodo = (id, newText, newDueDate) => {
     const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, alarmStatusColor: "purple" } : todo
+      todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, alarmStatusColor: "rgb(182, 120, 255)" } : todo
     );
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
@@ -134,7 +134,7 @@ const TodoApp = () => {
           isOpen={isAddEditModalOpen}
           onClose={() => setIsAddEditModalOpen(false)}
           onAddTodo={handleAddTodo}
-          onEditTodo={handleEditTodo}
+          onEdit={handleEditTodo}
         />
       )}
     </div>

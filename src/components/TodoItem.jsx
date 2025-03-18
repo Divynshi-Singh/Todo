@@ -5,8 +5,9 @@ import { FaTrashAlt } from "react-icons/fa";
 import moment from "moment";
 import TodoDeleteModal from "./TodoDeleteModel";
 
-const TodoItem = ({ todo, onEdit, toggleTaskCompletion,  onDelete }) => {
+const TodoItem = ({ todo, onEdit, toggleTaskCompletion, onDelete }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false); // Track if text is expanded
 
     const OpenDeleteOpen = () => {
         setIsDeleteModalOpen(true);
@@ -20,6 +21,12 @@ const TodoItem = ({ todo, onEdit, toggleTaskCompletion,  onDelete }) => {
         onDelete(todo.id);
         setIsDeleteModalOpen(false);
     };
+
+    const toggleTextExpansion = () => {
+        setIsExpanded(!isExpanded);
+    };
+
+    const truncatedText = todo.text.length > 45 ? todo.text.substring(0, 45) + "..." : todo.text;
 
     return (
         <li
@@ -39,9 +46,20 @@ const TodoItem = ({ todo, onEdit, toggleTaskCompletion,  onDelete }) => {
                 onChange={() => toggleTaskCompletion(todo.id)}
                 className="checkbox"
             />
-            {/* Todo Text and Due Date */}
-            <span className={`text-content flex-1 ${todo.completed ? "" : ""}`}>
-                {todo.text}
+
+
+            <span className="text-content flex-1">
+
+                <span className={`todo-text ${isExpanded ? "expanded" : "collapsed"}`}>
+                    {isExpanded ? todo.text : truncatedText}
+                </span>
+                {todo.text.length > 45 && (
+                    <button onClick={toggleTextExpansion} className=" btn-more-less text-[blue] bg-transparent text-sm mt-1">
+                        {isExpanded ? "Read Less.." : "Read More.."}
+                    </button>
+                )}
+
+                {/* Due Date */}
                 {todo.dueDate && (
                     <div className="flex items-center space-x-2 mt-2">
                         <IoAlarmOutline size={15} className="text-[gray] pt-[5px]" />
@@ -52,7 +70,6 @@ const TodoItem = ({ todo, onEdit, toggleTaskCompletion,  onDelete }) => {
                 )}
             </span>
 
-            {/* Alarm Status Indicator */}
             <div
                 className={`w-[10px] h-[10px] border-none rounded-full m-[4px]`}
                 style={{ backgroundColor: todo.alarmStatusColor }}

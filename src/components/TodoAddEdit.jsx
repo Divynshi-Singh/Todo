@@ -9,7 +9,7 @@ const TodoAddEdit = ({
   onClose,
 }) => {
   const [newTodo, setNewTodo] = useState({
-    text: todo ? todo.text : "",
+    text: todo ? todo.text.trim() : "",
     date: todo ? todo.dueDate : "",
   });
 
@@ -21,7 +21,7 @@ const TodoAddEdit = ({
   useEffect(() => {
     if (todo) {
       setNewTodo({
-        text: todo.text,
+        text: todo.text.trim(),
         date: todo.dueDate,
       });
     } else {
@@ -32,7 +32,8 @@ const TodoAddEdit = ({
     }
   }, [todo]);
 
-  const minDate = moment().format("YYYY-MM-DDTHH:mm");
+  const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Minimum date is the current date
+  const maxDate = moment("2026-12-31").format("YYYY-MM-DDTHH:mm"); // Maximum date is Dec 31, 2026
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,15 +45,22 @@ const TodoAddEdit = ({
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
-
     if (new Date(selectedDate) < new Date(minDate)) {
       setError({ ...error, alarm: "Alarm time must be in the future." });
+    } else if (new Date(selectedDate) > new Date(maxDate)) {
+      setError({ ...error, alarm: "Alarm time must be before 2027." });
     } else {
       setNewTodo((prevNewTodo) => ({
         ...prevNewTodo,
         date: selectedDate,
       }));
       setError({ ...error, alarm: "" });
+    }
+  };
+  const handleKeyDown = (e) => {
+    const value = e.target.value;
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value + e.key) && e.key !== "Backspace") {
+      e.preventDefault();  // Prevent invalid input
     }
   };
 
@@ -70,6 +78,9 @@ const TodoAddEdit = ({
       valid = false;
     } else if (new Date(newTodo.date) < new Date(minDate)) {
       newError.alarm = "Alarm time must be in the future.";
+      valid = false;
+    } else if (new Date(newTodo.date) > new Date(maxDate)) {
+      newError.alarm = "Alarm time must be before 2027.";
       valid = false;
     }
 
@@ -105,12 +116,12 @@ const TodoAddEdit = ({
       <div className="backdrop">
         {/* Backdrop */}
         <div
-          className=" absolute top-0 left-0 right-0 bottom-0 bg-gray-500 opacity-50 z-40"
+          className="absolute top-0 left-0 right-0 bottom-0 bg-gray-500 opacity-50 z-40"
           onClick={onClose}
         ></div>
 
         {/* Modal Content */}
-        <div className=" modal-content fixed top-[45%] left-[50%] transform -translate-x-[50%] -translate-y-[50%] bg-white border border-[rgba(169,169,169,0.3)] p-[10px] mt-[13px] z-50">
+        <div className="modal-content fixed top-[45%] left-[50%] transform -translate-x-[50%] -translate-y-[50%] bg-white border border-[rgba(169,169,169,0.3)] p-[10px] mt-[13px] z-50">
           <h1 className="text-[19px] pl-[7px] font-[system-ui] mb-[10px] text-[#52565b]">
             {todo ? "Edit Todo" : "Add Todo"}
           </h1>
@@ -118,7 +129,7 @@ const TodoAddEdit = ({
           {/* Modal Body */}
           <div>
             <textarea
-              name="text" // Use name attribute to identify the field
+              name="text"
               value={newTodo.text}
               onChange={handleInputChange}
               className={`w-[217px] h-[100px] ml-[10px] p-[7px] rounded-[10px] resize-none border border-[rgba(169,169,169,0.3)] ${error.todo || !newTodo.text.trim() ? "border-red-500" : "border-gray-300"
@@ -135,10 +146,10 @@ const TodoAddEdit = ({
               value={newTodo.date}
               onChange={handleDateChange}
               min={minDate}
+              max={maxDate} // max date here
               className={`rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] mt-[7px] border-[rgba(169,169,169,0.3)] ${error.alarm || !newTodo.date ? "border-red-500" : "border-gray-300"
                 }`}
-              inputMode="none"
-              onKeyDown={(e) => e.preventDefault()}
+            
             />
             {error.alarm && (
               <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>
