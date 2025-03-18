@@ -26,7 +26,7 @@ const TodoItem = ({ todo, onEdit, toggleTaskCompletion, onDelete }) => {
         setIsExpanded(!isExpanded);
     };
 
-    const truncatedText = todo.text.length > 45 ? todo.text.substring(0, 45) + "..." : todo.text;
+    const truncatedText = todo.text.length > 43 ? todo.text.substring(0, 43) + "..." : todo.text;
 
     return (
         <li
@@ -53,7 +53,7 @@ const TodoItem = ({ todo, onEdit, toggleTaskCompletion, onDelete }) => {
                 <span className={`todo-text ${isExpanded ? "expanded" : "collapsed"}`}>
                     {isExpanded ? todo.text : truncatedText}
                 </span>
-                {todo.text.length > 45 && (
+                {todo.text.length > 43 && (
                     <button onClick={toggleTextExpansion} className=" btn-more-less text-[blue] bg-transparent text-sm mt-1">
                         {isExpanded ? "Read Less.." : "Read More.."}
                     </button>

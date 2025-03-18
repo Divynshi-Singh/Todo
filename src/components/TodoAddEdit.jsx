@@ -57,12 +57,6 @@ const TodoAddEdit = ({
       setError({ ...error, alarm: "" });
     }
   };
-  const handleKeyDown = (e) => {
-    const value = e.target.value;
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value + e.key) && e.key !== "Backspace") {
-      e.preventDefault();  // Prevent invalid input
-    }
-  };
 
   const handleSubmit = () => {
     let valid = true;

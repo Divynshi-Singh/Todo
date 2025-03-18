@@ -46,7 +46,7 @@ const TodoApp = () => {
 
   const handleAddClick = () => {
     setIsAddEditModalOpen(true);
-    setEditingTodo(null); // Ensure we're not editing a todo
+    setEditingTodo(null); 
   };
 
   const handleEditClick = (todo) => {
@@ -69,7 +69,11 @@ const TodoApp = () => {
 
   const handleEditTodo = (id, newText, newDueDate) => {
     const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, alarmStatusColor: "rgb(182, 120, 255)" } : todo
+      todo.id === id ? { ...todo, text: newText, dueDate: newDueDate, 
+        // alarmStatusColor: "rgb(182, 120, 255)"
+        StatusColor: todo.completed ? todo.alarmStatusColor : "rgb(182, 120, 255)"
+       }
+         : todo
     );
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
@@ -120,8 +124,8 @@ const TodoApp = () => {
               todo={todo}
               onEdit={handleEditClick}
               onDelete={handleDeleteTodo}
-              toggleTaskCompletion={handleCheckboxChange} // Use handleCheckboxChange here
-              isChecked={todo.completed} // Directly use the 'completed' field for checkbox state
+              toggleTaskCompletion={handleCheckboxChange} 
+              isChecked={todo.completed} 
             />
           ))}
         </ul>
