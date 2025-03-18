@@ -32,8 +32,7 @@ const TodoAddEdit = ({
     }
   }, [todo]);
 
-  const minDate = moment().format("YYYY-MM-DDTHH:mm"); // Minimum date is the current date
-  const maxDate = moment("2026-12-31").format("YYYY-MM-DDTHH:mm"); // Maximum date is Dec 31, 2026
+  const minDate = moment().format("YYYY-MM-DDTHH:mm");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,27 +44,23 @@ const TodoAddEdit = ({
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
-    if (new Date(selectedDate) < new Date(minDate)) {
-      setError({ ...error, alarm: "Alarm time must be in the future." });
-    } else if (new Date(selectedDate) > new Date(maxDate)) {
-      setError({ ...error, alarm: "Alarm time must be before 2027." });
-    } else {
-      setNewTodo((prevNewTodo) => ({
-        ...prevNewTodo,
-        date: selectedDate,
-      }));
-      setError({ ...error, alarm: "" });
-    }
+    setNewTodo((prevNewTodo) => ({
+      ...prevNewTodo,
+      date: selectedDate,
+    }));
+    setError({ ...error, alarm: "" });
   };
 
   const handleSubmit = () => {
     let valid = true;
     let newError = { todo: "", alarm: "" };
 
+
     if (!newTodo.text.trim()) {
       newError.todo = "Todo is required";
       valid = false;
     }
+
 
     if (!newTodo.date) {
       newError.alarm = "Alarm time is required";
@@ -73,22 +68,24 @@ const TodoAddEdit = ({
     } else if (new Date(newTodo.date) < new Date(minDate)) {
       newError.alarm = "Alarm time must be in the future.";
       valid = false;
-    } else if (new Date(newTodo.date) > new Date(maxDate)) {
-      newError.alarm = "Alarm time must be before 2027.";
+    } else if (isNaN(new Date(newTodo.date).getTime())) {
+
+      newError.alarm = "Invalid date format.";
       valid = false;
     }
+
 
     if (!valid) {
       setError(newError);
       return;
     }
 
+
     if (todo) {
       onEdit(todo.id, newTodo.text, newTodo.date);
     } else {
       onAddTodo(newTodo.text, newTodo.date);
     }
-
     setNewTodo({
       text: "",
       date: "",
@@ -140,10 +137,8 @@ const TodoAddEdit = ({
               value={newTodo.date}
               onChange={handleDateChange}
               min={minDate}
-              max={maxDate} // max date here
               className={`rounded-[10px] mb-4 h-[40px] w-[217px] ml-[10px] pl-[12px] mt-[7px] border-[rgba(169,169,169,0.3)] ${error.alarm || !newTodo.date ? "border-red-500" : "border-gray-300"
                 }`}
-            
             />
             {error.alarm && (
               <p className="text-[red] text-sm mt-1 pl-[10px]">{error.alarm}</p>
